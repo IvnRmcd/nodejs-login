@@ -2,9 +2,14 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+
+//passport config
+require('./config/passport')(passport);
 
 
 //setting up server interface
@@ -34,16 +39,24 @@ app.use(session({
     saveUninitialized: true,
   }));
 
+  //ppassport 
+  
+app.use(passport.initialize());
+app.use(passport.session());
+
 //Connect Flash
 app.use(flash());
 
 
 //Global variables for the flash messages 
-app.use((req, res) =>{
+app.use((req, res, next) =>{
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+
     next();
 })
+
 
 
 //set routes for pages 

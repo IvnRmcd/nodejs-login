@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const user = require('../models/User');
 const bcrypt = require('bcryptjs');
-
+const passport = require('passport')
 const UserModel = require("../models/User");
 
 router.get('/login', (req, res) =>{res.render('login')});
- 
-
 router.get('/register', (req, res) =>{ res.render('register')});
 
+
+//Create validation Middleware for this route
 
 //Register Handle
 router.post('/register', (req, res) => {
@@ -77,10 +77,23 @@ if (errors.length > 0) {
 
 }
 
+});
+
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local',{
+        successRedirect: '/dashboard',
+        failureRedirect: '/users/login',
+        failureFlash: true
+    })(req,res,next)
 })
 
-//check passwords
 
-//check password length
+
+//Logout Handler
+router.get('/logout', (req,res) =>{
+    req.logout();
+    req.flash('success_msg', 'You have been logged out');
+    res.redirect('/users/login');
+})
 
 module.exports = router;
